@@ -1,39 +1,42 @@
-from rest_framework import generics, mixins
+from rest_framework import authentication, generics, mixins, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from django.shortcuts import get_object_or_404
 
+from api.authentication import TokenAuthentication
 from products.models import Product
+from products.permissions import IsStaffEditorPermission
 from products.serializers import ProductSerializer
 
 
-class ProductMixinView(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    generics.GenericAPIView,
-):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    lookup_field = 'pk'
+# class ProductMixinView(
+#     mixins.CreateModelMixin,
+#     mixins.ListModelMixin,
+#     mixins.RetrieveModelMixin,
+#     generics.GenericAPIView,
+# ):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     lookup_field = 'pk'
 
-    def get(self, request, *args, **kwargs):
-        # Detail view
-        pk = kwargs.get('pk')
-        if pk is not None:
-            return self.retrieve(request, *args, **kwargs)
-        # List view
-        return self.list(request, *args, **kwargs)
+#     def get(self, request, *args, **kwargs):
+#         # Detail view
+#         pk = kwargs.get('pk')
+#         if pk is not None:
+#             return self.retrieve(request, *args, **kwargs)
+#         # List view
+#         return self.list(request, *args, **kwargs)
     
-    # Create view.
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+#     # Create view.
+#     def post(self, request, *args, **kwargs):
+#         return self.create(request, *args, **kwargs)
 
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
 
     def perform_create(self, serializer):
         # serializer.save(user=self.request.user)
@@ -48,11 +51,13 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
 class ProductDetailAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
 
 
 class ProductUpdateAPIView(generics.UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
     lookup_field = 'pk'
 
     def perform_update(self, serializer):
@@ -64,6 +69,7 @@ class ProductUpdateAPIView(generics.UpdateAPIView):
 class ProductDestroyAPIView(generics.DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
     lookup_field = 'pk'
 
     def perform_destroy(self, instance):
