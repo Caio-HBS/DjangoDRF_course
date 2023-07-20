@@ -16,29 +16,32 @@ class ProductInlineSerializer(serializers.Serializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     owner = UserPublicSerializer(source='user', read_only=True)
-    edit_url = serializers.SerializerMethodField(read_only=True)
-    url = serializers.HyperlinkedIdentityField(
-        view_name='product-detail', lookup_field='pk'
-    )
-    title = serializers.CharField(validators=[
-        validate_title_no_space, unique_product_title
-    ])
+    #edit_url = serializers.SerializerMethodField(read_only=True)
+    #url = serializers.HyperlinkedIdentityField(
+    #    view_name='product-detail', lookup_field='pk'
+    #)
+    #title = serializers.CharField(validators=[
+    #    validate_title_no_space, unique_product_title
+    #])
+    body = serializers.CharField(source='content')
     # email = serializers.EmailField(write_only=True)
     # name = serializers.CharField(source='title', read_only=True) 
     class Meta:
         model = Product
         fields = [
             'owner',
-            'url',
-            'edit_url',
+            #'url',
+            #'edit_url',
             'pk',
             'title',
             # 'name',
             # 'email',
-            'content',
+            'body',
             'price',
             'sale_price',
             'public',
+            'path',
+            'endpoint',
         ]
 
     # def validate_title(self, value):
